@@ -1,34 +1,56 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+type JankenProps = {
+  hand : string
+  setMyHand: React.Dispatch<React.SetStateAction<string>>
+  setYourHand: React.Dispatch<React.SetStateAction<string>>
+}
+
+type WinnerProps = {
+  myHand : string
+  YourHand : string
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [myHand, setMyHand] = useState("")
+  const [YourHand, setYourHand] = useState("")
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>じゃんけん</h1>
+      <Janken hand='グー' setMyHand={setMyHand} setYourHand={setYourHand} />
+      <Janken hand='チョキ' setMyHand={setMyHand} setYourHand={setYourHand} />
+      <Janken hand='パー' setMyHand={setMyHand} setYourHand={setYourHand} />
+      {myHand && <p>自分の手 : {myHand}</p>}
+      {YourHand && <p>相手の手 : {YourHand}</p>}
+      {myHand && YourHand && <Winner myHand={myHand} YourHand={YourHand} />}
     </>
+  )
+}
+
+function Janken({hand, setMyHand, setYourHand}:JankenProps) {
+  const YourHands:string[]= ["グー", "チョキ", "パー"]
+
+  function handleClick() {
+    setMyHand(hand)
+    const randomIndex: number = Math.floor(Math.random() * YourHands.length)
+    setYourHand(YourHands[randomIndex])
+  }
+  return(
+    <>
+      <button onClick={handleClick}>{hand}</button>
+    </>
+  )
+}
+
+function Winner({myHand,YourHand}: WinnerProps) {
+  const judge = (me:string,you:string) => {
+    if(me == you)return "あいこ"
+    if((me == "グー" && you == "チョキ" || me == "チョキ" && you == "パー" || me == "パー" && you == "グー"))return "勝ち"
+    return "負け"
+  }
+  return (
+    <p>{judge(myHand,YourHand)}</p>
   )
 }
 
