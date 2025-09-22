@@ -1,22 +1,22 @@
 import { useState } from 'react'
 import './App.css'
 
-type inputProps = {
-  setTodoList : React.Dispatch<React.SetStateAction<Todo[]>>
-}
-type listProps = {
-  todoList : Todo[]
-  selectedIds : Set<string>
-  onToggle : (id: string) => void
-}
+type InputProps = {
+  setTodoList: React.Dispatch<React.SetStateAction<Todo[]>>;
+};
+type ListProps = {
+  todoList: Todo[];
+  selectedIds: Set<string>;
+  onToggle: (id: string) => void;
+};
 type Todo = {
-  id : string
-  text : string
-}
+  id: string;
+  text: string;
+};
 type DeleteButtonProps = {
-  onClick : () => void
-  disabled?: boolean
-}
+  onClick: () => void;
+  disabled?: boolean;
+};
 
 function App() {
   const [todoList, setTodoList] = useState<Todo[]>([])
@@ -38,59 +38,59 @@ function App() {
   return (
     <>
       <h1>TODOリスト</h1>
-      <Input setTodoList={setTodoList} />
-      <DeleteButton onClick={deleteSelected}/>
-      <List todoList={todoList} selectedIds={selectedIds} onToggle={toggleSelect}/>
+  <Input setTodoList={setTodoList} />
+  <DeleteButton onClick={deleteSelected} disabled={selectedIds.size === 0} />
+  <List todoList={todoList} selectedIds={selectedIds} onToggle={toggleSelect} />
     </>
   )
 }
 
-function Input({setTodoList}: inputProps){
-  const [val, setVal] = useState("")
+function Input({ setTodoList }: InputProps) {
+  const [value, setValue] = useState("");
 
-  const addTodo = () => {
-    const text = val.trim()
-    if (!text) return
-    const id = crypto.randomUUID?.() ?? String(Date.now())
-    setTodoList(prev => [...prev, { id, text }])
-    setVal("")
-  }
+  const handleAdd = () => {
+    const text = value.trim();
+    if (!text) return;
+    const id = crypto.randomUUID?.() ?? String(Date.now());
+    setTodoList(prev => [...prev, { id, text }]);
+    setValue("");
+  };
 
   return (
     <>
-      <input value={val} onChange={(e) => setVal(e.target.value)}></input>
-      <button onClick={addTodo}>保存</button>
+      <input value={value} onChange={e => setValue(e.target.value)} />
+      <button onClick={handleAdd}>保存</button>
     </>
-  )
+  );
 }
 
-function List({todoList, selectedIds, onToggle}: listProps) {
+function List({ todoList, selectedIds, onToggle }: ListProps) {
   return (
-     <ul>
-       {todoList.map((todo) => {
-        const id = `check-${todo.id}`
+    <ul>
+      {todoList.map(todo => {
+        const id = `check-${todo.id}`;
         return (
-          <>
           <li key={todo.id}>
             <input
-              type='checkbox'
+              type="checkbox"
               id={id}
               checked={selectedIds.has(todo.id)}
               onChange={() => onToggle(todo.id)}
-              />
+            />
             <label htmlFor={id}>{todo.text}</label>
           </li>
-          </>
-        )
+        );
       })}
     </ul>
-  )
+  );
 }
 
-function DeleteButton({onClick, disabled}: DeleteButtonProps){
+function DeleteButton({ onClick, disabled }: DeleteButtonProps) {
   return (
-    <button type='button' onClick={onClick} disabled={disabled}>削除</button>
-  )
+    <button type="button" onClick={onClick} disabled={disabled}>
+      削除
+    </button>
+  );
 }
 
 export default App
