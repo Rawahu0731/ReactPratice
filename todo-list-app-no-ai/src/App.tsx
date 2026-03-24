@@ -5,10 +5,15 @@ type tasksProps = {
   task: string;
   id: number;
   isComplete: boolean;
+  isChanging: boolean;
+  editString: string;
 }
 
 type ListProps = {
-  handleClick: (id: number) => void;
+  handleTaskClick: (id: number) => void;
+  handleChangeClick: (id: number) => void;
+  handleSaveClick: (id: number, inputValue: string) => void;
+  handleEditStringChange: (e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>, id: number) => void;
   tasks: tasksProps[];
   isClear: boolean;
 }
@@ -26,7 +31,9 @@ function App() {
       const row: tasksProps = {
         task: inputValue,
         id: cnt,
-        isComplete: false
+        isComplete: false,
+        isChanging: false,
+        editString: inputValue
       }
       setTasks([...tasks, row])
       setInputValue("");
@@ -46,6 +53,24 @@ function App() {
     ))
   }
 
+  const handleChangeClick = (id: number) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, isChanging: true, editString: task.task } : task
+    ))
+  }
+
+  const handleSaveClick = (id : number, inputValue: string) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, task: inputValue, isChanging: false} : task
+    ))
+  }
+
+  const handleEditStringChange = (e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>, id: number) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, editString: e.target.value} : task
+    ))
+  }
+
   return (
     <>
       <h1>TODOLIST</h1>
@@ -57,23 +82,34 @@ function App() {
 
       <div className="task-list">
         <h2>未達成リスト</h2>
-        <List handleClick={handleDeleteClick} tasks={tasks} isClear={false} />
+        <List handleTaskClick={handleDeleteClick} handleChangeClick={handleChangeClick} handleSaveClick={handleSaveClick} handleEditStringChange={handleEditStringChange} tasks={tasks} isClear={false} />
         <h2>達成済みリスト</h2>
-        <List handleClick={handletrueClick} tasks={tasks} isClear={true} />
+        <List handleTaskClick={handletrueClick} handleChangeClick={handleChangeClick} handleSaveClick={handleSaveClick} handleEditStringChange={handleEditStringChange} tasks={tasks} isClear={true} />
       </div>
     </>
   )
 }
 
-function List({ handleClick, tasks, isClear }: ListProps) {
+function List({ handleTaskClick, handleChangeClick, handleSaveClick, handleEditStringChange, tasks, isClear }: ListProps) {
   return (
     <div style={{ display: "flex" }}>
       <ul>
         {tasks.map((task) => (
           task.isComplete === isClear &&
           <li key={task.id}>
-            <button onClick={() => handleClick(task.id)}>{isClear ? "未達成" : "達成"}</button>
-            {task.task}
+            <button onClick={() => handleTaskClick(task.id)}>{isClear ? "未達成" : "達成"}</button>
+            {task.isChanging === true &&
+            <>
+            <input type="text" value={task.editString} placeholder={task.task} onChange={(e) => handleEditStringChange(e,task.id)} />
+            <button onClick={() => handleSaveClick(task.id, task.editString)}>保存</button>
+            </>
+            }
+            {task.isChanging === false &&
+              <>
+                {task.task}
+                <button onClick={() => handleChangeClick(task.id)}>編集</button>
+              </>
+            }
           </li>
         ))}
       </ul>
