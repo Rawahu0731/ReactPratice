@@ -18,6 +18,15 @@ type ListProps = {
   isClear: boolean;
 }
 
+type TaskItemProps = {
+  task: tasksProps;
+  handleTaskClick: (id: number) => void;
+  isClear: boolean;
+  handleEditStringChange: (e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>, id: number) => void;
+  handleSaveClick: (id: number, inputValue: string) => void;
+  handleChangeClick: (id: number) => void;
+}
+
 function App() {
 
 
@@ -59,15 +68,15 @@ function App() {
     ))
   }
 
-  const handleSaveClick = (id : number, inputValue: string) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, task: inputValue, isChanging: false} : task
+  const handleSaveClick = (id: number, inputValue: string) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, task: inputValue, isChanging: false } : task
     ))
   }
 
   const handleEditStringChange = (e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>, id: number) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, editString: e.target.value} : task
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, editString: e.target.value } : task
     ))
   }
 
@@ -96,25 +105,30 @@ function List({ handleTaskClick, handleChangeClick, handleSaveClick, handleEditS
       <ul>
         {tasks.map((task) => (
           task.isComplete === isClear &&
-          <li key={task.id}>
-            <button onClick={() => handleTaskClick(task.id)}>{isClear ? "未達成" : "達成"}</button>
-            {task.isChanging === true &&
-            <>
-            <input type="text" value={task.editString} placeholder={task.task} onChange={(e) => handleEditStringChange(e,task.id)} />
-            <button onClick={() => handleSaveClick(task.id, task.editString)}>保存</button>
-            </>
-            }
-            {task.isChanging === false &&
-              <>
-                {task.task}
-                <button onClick={() => handleChangeClick(task.id)}>編集</button>
-              </>
-            }
-          </li>
+          <TaskItem key={task.id} task={task} handleTaskClick={handleTaskClick} isClear={isClear} handleEditStringChange={handleEditStringChange} handleSaveClick={handleSaveClick} handleChangeClick={handleChangeClick} />
         ))}
       </ul>
     </div>
   )
 }
 
+function TaskItem({task, handleTaskClick, isClear, handleEditStringChange, handleSaveClick, handleChangeClick}:TaskItemProps) {
+  return (
+    <li>
+      <button onClick={() => handleTaskClick(task.id)}>{isClear ? "未達成" : "達成"}</button>
+      {task.isChanging === true &&
+        <>
+          <input type="text" value={task.editString} placeholder={task.task} onChange={(e) => handleEditStringChange(e, task.id)} />
+          <button onClick={() => handleSaveClick(task.id, task.editString)}>保存</button>
+        </>
+      }
+      {task.isChanging === false &&
+        <>
+          {task.task}
+          <button onClick={() => handleChangeClick(task.id)}>編集</button>
+        </>
+      }
+    </li>
+  )
+}
 export default App
